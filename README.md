@@ -6,6 +6,9 @@ HTMLの改ざんを検知したらその旨を表示
 試し方
 ------
 
+こちらからお試しいただけます。
+* [https://midolin.info/detect-fishing-modification/](https://midolin.info/detect-fishing-modification/)
+
 開発ツールを開いて、適当に枠線内を書き換えようとしてみてください。"【改ざん済み】"と表示されます。
 
 仕組み
