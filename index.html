@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>HTMLの改ざんを検知したらその情報を表示するもの</title>
+	<script type="text/javascript">
+		var mutationObserver = new MutationObserver(onChanged);
+		var target = 0;
+		var original = 0;
+		var ignoreOnChanged = false;
+
+		// 変更が検知された際に実行される関数
+		function onChangeDetected() {
+			ignoreOnChanged = true;
+			// 今回は h2 の before 属性に情報を出すようにしたが、
+			// もっと有効なやり方もあると思う
+			document.querySelector("#content>h2").setAttribute("modified", "【改ざん済み】");
+		}
+
+		function onChanged() {
+			if (!ignoreOnChanged && original !== target.innerHTML) {
+				onChangeDetected();
+			}
+			setTimeout(function() {
+				// onChangeDetected で発生した変更によって無限ループに陥るため、
+				// setTimeoutでほどよく待機して再度検知を有効にする
+				ignoreOnChanged = false;
+			}, 100);
+		}
+
+		function onLoaded() {
+			// ターゲットを指定
+			target = document.getElementById("content");
+			
+			// ロード完了時にオリジナルコンテンツを保存する
+			if (original === 0) {
+				original = target.innerHTML;
+			}
+			mutationObserver.observe(target, {
+				childList: true,
+				attributes: true,
+				characterData: true,
+				subtree: true
+			});
+		}
+
+		document.addEventListener("load", onLoaded, true);
+	</script>
+	<style type="text/css">
+		body {
+			text-align: center;
+		}
+		
+		#container {
+			width: 700px;
+			text-align: left;
+			margin: auto;
+		}
+		
+		#content {
+			border: 1px solid gray;
+		}
+		
+		/* 改ざん表示用の before 属性 */
+		#content>h2:before {
+			content: attr(modified);
+		}
+	</style>
+</head>
+
+<body>
+	<div id="container">
+		<header>
+			<h1>HTMLの改ざんを検知したらその旨を表示</h1>
+		</header>
+		<article id="content">
+			<h2>偽情報</h2>
+			<p>偽情報（にせじょうほう）は、意図的に広められる虚偽もしくは不正確な情報である。偽造された文書、原稿及び写真の流布、あるいは悪意のある噂や捏造されたインテリジェンスを広めることが含まれる。偽情報を誤報と混同してはいけない。誤報は単に間違った情報が広まったものである。 諜報あるいはミリタリー・インテリジェンスにおいては、偽情報は敵の立場あるいは行動方針に応じて敵を間違った方向に誘導するために意図的に広められる。政治においては、偽情報は相手側を研究することにより明かされた候補者の弱点をもとにしたいかがわしい虚偽の発言を流布して政敵への有権者の支持をそらすための意図的な試みである。
+				両方の分野とも、偽情報ということには実際の情報は利用できないように歪曲されるということが含まれる。 商業や行政においても偽情報の技術は競争相手の地位を徐々に弱めることを望むグループにより使用されることがある。誰かに虚偽を納得させるのは、現実には詐欺と明白な虚偽の言葉である。粉飾決算は上場企業会計改革および投資家保護法の制定を導いた偽情報戦略とも考えられる。 感情的な支持を求めるために意図される伝統的なプロパガンダや「大きな嘘」の技術とは異なり、偽情報は対抗的で不都合な情報の信頼性を落とすこと、あるいは間違った結論を支持することによって理性的な水準の観衆を操るように意図される。
+				あるグループがそれだけの影響力を持っている場合には事実を隠蔽する技術、つまり検閲も行われる。情報の経路を完全に閉鎖することができない場合、その経路を偽情報で満たし、簡単に反証が容易な程度のウソの主張を大量に組み合せることで効果的にその経路のS/N比（正確さ）を低下させ相手の信頼性を落として、役に立たなくすることができる。 一般の偽情報手法は、若干の事実に虚偽の結論とウソが入った観察の両方を併せるか、それが全てあるように事実の一部を見せることである（後者はLimited Hangoutと呼ばれる）。
+				冷戦により偽情報が軍事的かつ政治的な戦術であることの認識が生れた。軍事的な偽情報技術は、ウラジーミル・ボルコフ (Vladimir Volkoff) によって説明されている。</p>
+			<p>出展 ―― <a href="https://ja.wikipedia.org/wiki/%E5%81%BD%E6%83%85%E5%A0%B1">偽情報 - Wikipedia</a></p>
+		</article>
+		<hr>
+		<footer>
+			<h2>使い方</h2>
+			<p>開発ツールを開いて、適当に枠線内を書き換えようとしてみてください。"【改ざん済み】"と表示されます。</p>
+			<h2>仕組み</h2>
+			<p>MutationObserverを利用しています。変更されると、attributeを書き換え、改ざんされていることを表します。</p>
+			<h2>注意</h2>
+			<ul>
+				<li>このツールで防げるものは、入れ知恵された技術レベルの低い愉快犯によるコンテンツの改変です。本気で改変される場合、手も足も出ません。</li>
+				<li>実際に利用する場合、関数名、変数名などは難読化すると、より効果的かもしれません。</li>
+				<li>動的なサイトの場合、onLoadedで行っているオリジナルの保存を工夫する必要があるかと思います。</li>
+				<li>作者はJavaScript/HTML/CSSに熟達しているわけではありません。変なところはご容赦ください。</li>
+			</ul>
+			<dl>
+				<dt>利用に関して</dt>
+				<dd>考え方(MutationObserverを利用する、など)は、"釣り"のない世界づくりのために、制約なく、ぜひご利用ください。この文書そのものに関しては、CC BY-SA-NCです。</dd>
+				<dt>作者</dt>
+				<dd>limemidolin</dd>
+				<dt>連絡先</dt>
+				<dd>
+					<dl>
+						<dt>Twitter</dt>
+						<dd><a href="https://twitter.com/limemidolin">limemidolin</a></dd>
+						<dt>Webサイト</dt>
+						<dd><a href="https://midolin.info/">Flush memories</a></dd>
+						<dt>GitHub</dt>
+						<dd><a href="https://github.com/limemidolin">limemidolin on GitHub</a></dd>
+					</dl>
+				</dd>
+			</dl>
+		</footer>
+	</div>
+</body>
+
+</html>
