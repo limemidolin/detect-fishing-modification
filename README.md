@@ -7,7 +7,7 @@ HTMLの改ざんを検知したらその旨を表示
 ------
 
 こちらからお試しいただけます。
-* [https://midolin.info/detect-fishing-modification/](https://midolin.info/detect-fishing-modification/)
+* [https://limemidolin.github.io/detect-fishing-modification/](https://limemidolin.github.io/detect-fishing-modification/)
 
 開発ツールを開いて、適当に枠線内を書き換えようとしてみてください。"【改ざん済み】"と表示されます。
 
